@@ -1,20 +1,67 @@
 # coding:utf-8
+import requests
+import re
 
-import urllib2
-import urllib
 
-page = 1
-url = 'http://www.qiushibaike.com/hot/page/' + str(page)
-user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:55.0) Gecko/20100101 Firefox/55.0'
-refer = 'https://pos.baidu.com/wcom?rdid=3007983&dc=3&di=u3007983&dri=0&dis=3&dai=1&ps=0x0&dcb=___adblockplus&dtm=HTML_POST&dvi=0.0&dci=-1&dpt=none&tsr=0&ti=%E5%A4%AE%E8%A7%86%E7%BD%91_%E4%B8%96%E7%95%8C%E5%B0%B1%E5%9C%A8%E7%9C%BC%E5%89%8D&ari=2&dbv=0&drs=1&pcs=300x250&pss=300x250&cfv=0&cpl=1&chi=2&cce=true&cec=UTF-8&tlm=1494577607&prot=2&rw=320&ltu=https%3A%2F%2Fstatic01.5plus.cntv.cn%2Fcntv%2Fsports%2Fnews%2Fchannel.html%3Fuid%3Du3007983%26width%3D300%26height%3D250%26at%3D3%26rsi0%3D300%26rsi1%3D250%26pat%3D17%26tn%3DbaiduCustNativeAD%26rss1%3D%2523FFFFFF%26conBW%3D1%26adp%3D1%26ptt%3D0%26titFF%3D%25E5%25BE%25AE%25E8%25BD%25AF%25E9%259B%2585%25E9%25BB%2591%26titFS%3D14%26rss2%3D%2523000000%26titSU%3D0&liu=https%3A%2F%2Fstatic01.5plus.cntv.cn%2Fcntv%2Fsports%2Fnews%2Frender.html%3Fuid%3Du3007983%26width%3D300%26height%3D250%26at%3D3%26rsi0%3D300%26rsi1%3D250%26pat%3D17%26tn%3DbaiduCustNativeAD%26rss1%3D%2523FFFFFF%26conBW%3D1%26adp%3D1%26ptt%3D0%26titFF%3D%25E5%25BE%25AE%25E8%25BD%25AF%25E9%259B%2585%25E9%25BB%2591%26titFS%3D14%26rss2%3D%2523000000%26titSU%3D0&ltr=https%3A%2F%2Fstatic01.5plus.cntv.cn%2Fcntv%2Fsports%2Fnews%2Fchannel.html%3Fuid%3Du3007983%26width%3D300%26height%3D250%26at%3D3%26rsi0%3D300%26rsi1%3D250%26pat%3D17%26tn%3DbaiduCustNativeAD%26rss1%3D%2523FFFFFF%26conBW%3D1%26adp%3D1%26ptt%3D0%26titFF%3D%25E5%25BE%25AE%25E8%25BD%25AF%25E9%259B%2585&ecd=1&uc=1680x947&pis=300x250&sr=1680x1050&tcn=1507820555&qn=bdba6e1dd2d01a19&tt=1507820555381.47.91.96'
-cookies = 'CPROID=506B85F942A834D8A518F347A0269951:FG=1'
-headers = {'User-Agent': user_agent, 'Referer': refer, 'Cookie': cookies}
-try:
-    request = urllib2.Request(url, headers=headers)
-    response = urllib2.urlopen(request)
-    print response.read()
-except urllib2.URLError, e:
-    if hasattr(e, 'code'):
-        print e.code
-    if hasattr(e, 'reason'):
-        print e.reason
+class QS_Scrawer(object):
+    '''
+        糗事百科爬取
+    '''
+    domain = 'https://www.qiushibaike.com'
+    url = 'https://www.qiushibaike.com/8hr/page/'  # 默认爬取的网页url
+    reg = r'<div class="article block untagged mb15 typs_recent" id=.*?>.*?<div class="author clearfix">.*?<a href="(/users/.*?)".*?<img src="(.*?)" alt="(.*?)">.*?</a>.*?</div>.*?<a href="(/article/.*?)".*?>.*?<div class="content">.*?<span>\n+(.*?)\n+</span>.*?</div>.*?</a>\n*?(.*?)\n*?</div>'  # 正则
+    regImg = r'<div class="thumb">.*?<a href="/article/.*?" target="_blank">.*?<img src="(.*?)".*?>.*?</a>'  # 配图正则
+    page = 1
+
+    def __init__(self, url='', reg='', regimg=''):
+        self.url = url if url else QS_Scrawer.url
+        self.reg = reg if reg else QS_Scrawer.reg
+        self.regImg = regimg if regimg else QS_Scrawer.regImg
+        self.enable = True
+
+    def getPatterns(self):
+        return [re.compile(self.reg, re.DOTALL), re.compile(self.regImg, re.DOTALL)]
+
+    def getRawText(self):
+        return requests.get(self.url + str(self.page)).text
+
+    def getItems(self):
+        return re.findall(self.getPatterns()[0], self.getRawText())
+
+    def printful(self):
+        for i in self.getItems():
+            print '-------------------*****------------------'
+            print "用户主页地址：", self.domain + i[0]
+            print "用户头像地址：", "http:" + i[1]
+            print "用户名称：", i[2]
+            print "段子主页：", self.domain + i[3]
+            print "段子内容:", i[4]
+            # print i[5]
+            if i[5]:
+                haveImg = re.findall(self.getPatterns()[1], i[5])
+                if haveImg:
+                    print "段子图片地址：", "http:" + haveImg[0]
+                else:
+                    print "段子图片地址：", "无配图"
+            else:
+                print "段子图片地址：", "无配图"
+
+    def start(self):
+        print '开始爬取糗事百科...如果失败，请自行修改正则\n' \
+              '按Enter查看下一页...按Q退出...'
+
+        while self.enable:
+            flag = raw_input()
+            self.page += 1
+            if flag == 'Q':
+                self.enable = False
+                print 'Bye~'
+                return
+            print '努力爬取中...'
+            try:
+                self.printful()
+            except requests.exceptions.ConnectionError:
+                print '网络有问题哦!'
+
+
+QS_Scrawer().start()
