@@ -7,6 +7,9 @@ print result.text
 
 
 class TBMM_scrawer(object):
+    '''
+        淘宝mm 信息爬取
+    '''
     def __init__(self, url):
         self.url = url
 
