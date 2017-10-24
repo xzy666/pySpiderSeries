@@ -2,9 +2,6 @@
 import requests
 import re
 
-result = requests.get('https://mm.taobao.com/json/request_top_list.htm?page=2')
-print result.text
-
 
 class TBMM_scrawer(object):
     '''
