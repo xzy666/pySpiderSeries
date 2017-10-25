@@ -7,6 +7,7 @@ class TBMM_scrawer(object):
     '''
         淘宝mm 信息爬取
     '''
+
     def __init__(self, url):
         self.url = url
 
@@ -15,8 +16,10 @@ class TBMM_scrawer(object):
         return result.text
 
     def getContent(self, page=1):
-        reg = re.compile(r'', re.DOTALL)
-        return re.findall(reg, self.getContent())
+        reg = re.compile(
+            r'(<div class="list-item">.*?</div>)',
+            re.DOTALL)
+        return re.findall(reg, self.getRawText())
 
     def start(self):
         while True:
@@ -28,7 +31,5 @@ class TBMM_scrawer(object):
             for i in self.getContent(page):
                 print '-----------------------------------------------------------------------------'
                 print i
-
-
-T = TBMM_scrawer('ttps://mm.taobao.com/json/request_top_list.htm?page=%d')
+T = TBMM_scrawer('https://mm.taobao.com/json/request_top_list.htm?page=%d')
 T.start()
