@@ -9,7 +9,7 @@ from os import path
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-
+import random
 
 class Weibo(object):
     '''
@@ -61,6 +61,10 @@ class DataDeal(object):
         return blogs
 
 
+def grey_color_func(word, font_size, position, orientation, random_state=None,
+                    **kwargs):
+    return "hsl(0, 80%%, %d%%)" % random.randint(60, 100)
+
 def generate_image():
     data = []
     # jieba.analyse.set_stop_words("./weibo1.txt")
@@ -87,36 +91,59 @@ def generate_image():
     d = path.dirname(__file__)
 
     # Read the whole text.
-    text = open(path.join(d, 'weibo_jieba.txt')).read()
+    # text = open(path.join(d, 'weibo_jieba.txt')).read()
 
     # read the mask image
     # taken from
     # http://www.stencilry.org/stencils/movies/alice%20in%20wonderland/255fk.jpg
-    alice_mask = np.array(Image.open(path.join(d, "test1.jpg")))
+    alice_mask = np.array(Image.open(path.join(d, "test1.png")))
 
     stopwords = set(STOPWORDS)
     stopwords.add("said")
-    wc = WordCloud(background_color="white",  # 设置背景颜色
+    wc = WordCloud(background_color="lightgreen",  # 设置背景颜色
                    mask=alice_mask,  # 设置背景图片
                    max_words=2000,  # 设置最大显示的字数
                    # stopwords = "", #设置停用词
                    font_path="FZHTJW.TTF",
                    # 设置中文字体，使得词云可以显示（词云默认字体是“DroidSansMono.ttf字体库”，不支持中文）
                    )
+    text = open(path.join(d, 'weibo1.txt')).read()
+
+    def jiebaclearText(text):
+        mywordlist = []
+        seg_list = jieba.cut(text, cut_all=False)
+        liststr = "/ ".join(seg_list)
+        f_stop = open('stopwords.txt')
+        try:
+            f_stop_text = f_stop.read()
+            f_stop_text = unicode(f_stop_text, 'utf-8')
+        finally:
+            f_stop.close()
+        f_stop_seg_list = f_stop_text.split('\n')
+        for myword in liststr.split('/'):
+            if not (myword.strip() in f_stop_seg_list) and len(myword.strip()) > 1:
+                mywordlist.append(myword)
+        return ''.join(mywordlist)
+
+    isCN = 1
+    if isCN:
+        text = jiebaclearText(text)
     #
     # wc = WordCloud(background_color="white", max_words=2000, mask=alice_mask,
     #                stopwords=stopwords)
     # generate word cloud
-    wc.generate_from_frequencies(text)
+    wc.generate(text)
 
     # store to file
     wc.to_file(path.join(d, "alice.png"))
 
     # show
-    plt.imshow(wc, interpolation='bilinear')
+    plt.imshow(wc.recolor(color_func=grey_color_func, random_state=3),
+               interpolation="bilinear")
+    plt.savefig('alice.png')
+
     plt.axis("off")
     plt.figure()
-    plt.imshow(alice_mask, cmap=plt.cm.gray, interpolation='bilinear')
     plt.axis("off")
     plt.show()
 
@@ -125,4 +152,3 @@ def generate_image():
 # W = Weibo()
 # W.fecth_data()
 generate_image()
-# print u'\u8ba9'
