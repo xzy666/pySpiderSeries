@@ -33,7 +33,7 @@ class ZhiHu(object):
     accept = 'application/json, text/plain, */*'
     ContentType = 'application/x-www-form-urlencoded;charset=UTF-8'
     cookie = '''q_c1=0a0455b353cd4f0186b62adf0c2495fc|1509193541000|1509193541000; d_c0="AEBCfSbQmAyPTnnQt2dv3xKHugW13Gd0HPA=|1509193542"; _zap=e84963cf-ab47-4d25-8c5b-d3c6c1cc0f01; _xsrf=f6111331-e700-4b67-9aef-758fe10f6ada; capsion_ticket="2|1:0|10:1510962491|14:capsion_ticket|44:Yjk2OTUzMDczNDIxNDlkNmE3OTMxZjNhMjUzOTE2YjI=|dfb476fb8af6e77fb04e309a9e3cacc9f1534b249cab6f1ad3490924a9b4783a"; l_cap_id="MDdkODZlYTc4N2M0NGVlN2E1ZTdkZjhhMWE4N2UwNGQ=|1510962906|046d4d4579f22246f2b8778b43579d3781cb77d3"; r_cap_id="ZDhlN2UwMTdjMmFhNDMzM2E0OWQ4YWIzNTIwODUxYjA=|1510962906|10365ced5a6b25e5c10d0e6220e7f48195289633"; cap_id="MGFhOGRkMWUwN2FiNGNiZWE1M2Q2NTA2ZDZjYmU1ZjA=|1510962906|cabbc22338d8254afab816555dcbe5b8eb6b0679"; __utma=51854390.269528696.1509847772.1510959839.1510961799.3; __utmb=51854390.0.10.1510961799; __utmc=51854390; __utmz=51854390.1510961799.3.3.utmcsr=zhihu.com|utmccn=(referral)|utmcmd=referral|utmcct=/; __utmv=51854390.000--|2=registration_date=20170212=1^3=entry_date=20171028=1;'''
-    z_c0 = '你的'
+    z_c0 = '你的z_c0'
     # session = requests.session()
     # session.cookies = cookiejar.LWPCookieJar(filename='cookies.txt')
     headers = {'User-Agent': user_agent, 'Referer': referer, 'Origin': origin, 'Host': host,
